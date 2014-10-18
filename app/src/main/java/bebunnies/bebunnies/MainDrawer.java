@@ -1,14 +1,30 @@
 package bebunnies.bebunnies;
 
-import android.app.ActionBar;
 import android.app.Activity;
+
+import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.support.v4.widget.DrawerLayout;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
+import com.spotify.sdk.android.Spotify;
+import com.spotify.sdk.android.authentication.AuthenticationResponse;
+import com.spotify.sdk.android.authentication.SpotifyAuthentication;
+import com.spotify.sdk.android.playback.ConnectionStateCallback;
+import com.spotify.sdk.android.playback.Player;
+import com.spotify.sdk.android.playback.PlayerNotificationCallback;
+import com.spotify.sdk.android.playback.PlayerState;
 
 public class MainDrawer extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -18,6 +34,11 @@ public class MainDrawer extends Activity
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
+    private static final String CLIENT_ID = "0023543d6cd041ad8befcff636ad89e5";
+    private static final String REDIRECT_URI = "coke-android://callback";
+    public static Player mPlayer;
+    private Uri localUri;
+    
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -97,4 +118,97 @@ public class MainDrawer extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-}
+    @Override
+    public void onLoggedIn() {
+        Log.d("logged in", "MYLOG");
+    }
+
+    @Override
+    public void onLoggedOut() {
+        Log.d("logged out", "MYLOG");
+    }
+
+    @Override
+    public void onLoginFailed(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onTemporaryError() {
+
+    }
+
+    @Override
+    public void onNewCredentials(String s) {
+
+    }
+
+    @Override
+    public void onConnectionMessage(String s) {
+
+    }
+
+    @Override
+    public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        Spotify.destroyPlayer(this);
+        super.onDestroy();
+
+    }
+
+    public Player getPlayer() {
+        return mPlayer;
+    }
+
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private boolean paused = false;
+
+        private Button pauseButton;
+
+        public PlaceholderFragment() {
+        }
+
+
+    }
+
+/*
+ @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            ((MainDrawer) activity).onSectionAttached(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+        
+        
+        in oncreate
+   pauseButton = (Button) rootView.findViewById(R.id.pauseButton);
+            pauseButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if (!paused) {
+                        mPlayer.pause();
+                        paused = true;
+                    } else {
+                        mPlayer.resume();
+                        paused = false;
+                    }
+                }
+            });
+   
+   
+   and aobove on create
+   private Button pauseButton;
+ */
