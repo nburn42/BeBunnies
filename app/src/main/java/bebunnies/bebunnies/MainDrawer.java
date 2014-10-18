@@ -1,41 +1,50 @@
 package bebunnies.bebunnies;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+
+import com.spotify.sdk.android.Spotify;
+import com.spotify.sdk.android.authentication.AuthenticationResponse;
+import com.spotify.sdk.android.authentication.SpotifyAuthentication;
+import com.spotify.sdk.android.playback.ConnectionStateCallback;
+import com.spotify.sdk.android.playback.Player;
+import com.spotify.sdk.android.playback.PlayerNotificationCallback;
+import com.spotify.sdk.android.playback.PlayerState;
 
 
-public class MainDrawer extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
+public class MainDrawer extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks, PlayerNotificationCallback, ConnectionStateCallback {
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
+    private static final String CLIENT_ID = "0023543d6cd041ad8befcff636ad89e5";
+    private static final String REDIRECT_URI = "coke-android://callback";
+    /**
+     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+     */
+    private NavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
+    private Player mPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
+
+        SpotifyAuthentication.openAuthWindow(CLIENT_ID, "token", REDIRECT_URI,
+                new String[]{"user-read-private", "streaming"}, null, this);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -45,7 +54,34 @@ public class MainDrawer extends Activity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        Log.d("asdf", "MYLOG");
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Uri uri = intent.getData();
+        if (uri != null) {
+            AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
+            Spotify spotify = new Spotify(response.getAccessToken());
+            mPlayer = spotify.getPlayer(this, "BeBunnies", this, new Player.InitializationObserver() {
+                @Override
+                public void onInitialized() {
+                    mPlayer.addConnectionStateCallback(MainDrawer.this);
+                    mPlayer.addPlayerNotificationCallback(MainDrawer.this);
+                    mPlayer.play("spotify:track:4dHEDIHRGkDQdKJNTHOBo2");
+                    Log.d("on initialized","MYLOG" );
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    Log.e("MYLOG", "Could not initialize player: " + throwable.getMessage());
+                }
+            });
+        }
+    }
+
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -103,6 +139,48 @@ public class MainDrawer extends Activity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onLoggedIn() {
+        Log.d("logged in", "MYLOG");
+    }
+
+    @Override
+    public void onLoggedOut() {
+        Log.d("logged out", "MYLOG");
+    }
+
+    @Override
+    public void onLoginFailed(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onTemporaryError() {
+
+    }
+
+    @Override
+    public void onNewCredentials(String s) {
+
+    }
+
+    @Override
+    public void onConnectionMessage(String s) {
+
+    }
+
+    @Override
+    public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        Spotify.destroyPlayer(this);
+        super.onDestroy();
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -112,6 +190,9 @@ public class MainDrawer extends Activity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public PlaceholderFragment() {
+        }
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -125,12 +206,9 @@ public class MainDrawer extends Activity
             return fragment;
         }
 
-        public PlaceholderFragment() {
-        }
-
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main_drawer, container, false);
             return rootView;
         }
