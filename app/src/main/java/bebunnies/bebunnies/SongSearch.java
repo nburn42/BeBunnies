@@ -4,9 +4,15 @@ import com.echonest.api.v4.EchoNestAPI;
 import com.echonest.api.v4.EchoNestException;
 import com.echonest.api.v4.Song;
 import com.echonest.api.v4.SongParams;
+import com.echonest.api.v4.Track;
+
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.List;
+import com.echonest.api.v4.Playlist;
+import com.echonest.api.v4.PlaylistParams;
+
 
 /**
  * @ author: Manav Dutta
@@ -59,13 +65,56 @@ public class SongSearch {
         }
         return songs;
     }
+    public List<Song> goodSongSearch(int tempo) throws EchoNestException {
+        SongParams p = new SongParams();
+        p.setMinTempo(tempo);
+        p.setMaxTempo(tempo + .99f);
+        p.setResults(80);
+        p.setMinDanceability(.4f);
+        p.setMinArtistHotttnesss(.6f);
+        p.setMinSongHotttnesss(.6f);
+        p.setMinArtistFamiliarity(.6f);
+        p.setArtistActiveDuring(2007, 2014);
+        p.includeAudioSummary();
+        List<Song> songs = en.searchSongs(p);
+        List<Song> toReturn = new ArrayList<Song>();
+        for(Song song : songs) {
+           song.fetchBucket("audio_summary");
+           double value = song.getDouble("audio_summary.valence");
+           if (value >= .4) {
+              toReturn.add(song);
+           }
+        }
+        return toReturn;
+    }
+    public Playlist returnPlayList(int results) {
+           PlaylistParams params = new PlaylistParams();
+           params.setMinTempo(100);
+           params.setResults(results);
+           params.setMinDanceability(.4f);
+           params.includeAudioSummary();
+           params.setSongMinHotttnesss(.5f);
+           params.setArtistMinFamiliarity(.3f);
+           try {
+               Playlist playlist = en.createStaticPlaylist(params);
+               return playlist;
+           }
+           catch(EchoNestException e) {
+               System.out.println(e.getMessage());
+           }
+           return new Playlist(new ArrayList<Song>());
+    }
     public static void main(String [] args) {
         SongSearch search = new SongSearch();
         try {
-            List<Song> songs = search.searchSongsByTempo(50, 450, 20);
+            List<Song> songs = search.goodSongSearch(100);
+            System.out.println(songs.size());
             for (Song song : songs) {
-                System.out.printf("%.0f %s %s\n", song.getTempo(), song
-                        .getArtistName(), song.getTitle());
+                    song.fetchBucket("audio_summary");
+                    Track track = song.getTrack("spotify-WW");
+                    System.out.println(song.getArtistName());
+                    System.out.println(song.getTitle());
+                    System.out.println(song.getDouble("audio_summary.valence"));
             }
         }
         catch(EchoNestException e) {
