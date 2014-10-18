@@ -18,7 +18,7 @@
         android:layout_height="fill_parent"
         android:layout_weight="1"
         android:paddingTop="50dp"
-        android:paddingBottom="40dp">
+        android:paddingBottom="30dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -34,6 +34,40 @@
             android:id="@+id/seekBar"
             android:progress="50"
             android:paddingTop="30dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left">
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Relaxing"
+                    android:id="@+id/textView"
+                    android:layout_alignParentLeft="true"
+                    android:textColor="#FF353535" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Exciting"
+                    android:id="@+id/textView2"
+                    android:gravity="right"
+                    android:singleLine="false"
+                    android:layout_alignParentRight="true"
+                    android:textColor="#ff353535" />
+            </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
