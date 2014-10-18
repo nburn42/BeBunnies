@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.spotify.sdk.android.Spotify;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -31,12 +32,13 @@ public class MainDrawer extends Activity implements NavigationDrawerFragment.Nav
      */
     private static final String CLIENT_ID = "0023543d6cd041ad8befcff636ad89e5";
     private static final String REDIRECT_URI = "coke-android://callback";
+    public static Player mPlayer;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
-    private Player mPlayer;
+    private Uri localUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,6 @@ public class MainDrawer extends Activity implements NavigationDrawerFragment.Nav
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
         Log.d("asdf", "MYLOG");
     }
 
@@ -62,6 +63,7 @@ public class MainDrawer extends Activity implements NavigationDrawerFragment.Nav
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Uri uri = intent.getData();
+        localUri = uri;
         if (uri != null) {
             AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
             Spotify spotify = new Spotify(response.getAccessToken());
@@ -70,8 +72,8 @@ public class MainDrawer extends Activity implements NavigationDrawerFragment.Nav
                 public void onInitialized() {
                     mPlayer.addConnectionStateCallback(MainDrawer.this);
                     mPlayer.addPlayerNotificationCallback(MainDrawer.this);
-                    mPlayer.play("spotify:track:4dHEDIHRGkDQdKJNTHOBo2");
-                    Log.d("on initialized","MYLOG" );
+                    mPlayer.play("spotify:track:6JEntXLt4z98CcDtIH9sU7");
+                    Log.d("on initialized", "MYLOG");
                 }
 
                 @Override
@@ -181,15 +183,22 @@ public class MainDrawer extends Activity implements NavigationDrawerFragment.Nav
 
     }
 
+    public Player getPlayer() {
+        return mPlayer;
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+        private static final String ARG_SECTION_NUMBER = "section_number";
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+        private boolean paused = false;
+
+        private Button pauseButton;
 
         public PlaceholderFragment() {
         }
@@ -210,6 +219,20 @@ public class MainDrawer extends Activity implements NavigationDrawerFragment.Nav
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main_drawer, container, false);
+            pauseButton = (Button) rootView.findViewById(R.id.pauseButton);
+            pauseButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if (!paused) {
+                        mPlayer.pause();
+                        paused = true;
+                    } else {
+                        mPlayer.resume();
+                        paused = false;
+                    }
+                }
+            });
             return rootView;
         }
 
