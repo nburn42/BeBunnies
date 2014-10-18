@@ -90,24 +90,6 @@ public class SongSearch {
         }
         return toReturn;
     }
-    public Playlist returnPlayList(int results) {
-           PlaylistParams params = new PlaylistParams();
-           params.setMinTempo(100);
-           params.setResults(results);
-           params.setMinDanceability(.4f);
-           params.includeAudioSummary();
-           params.setSongMinHotttnesss(.5f);
-           params.setArtistMinFamiliarity(.3f);
-           params.addArtist("Bruno Mars");
-           try {
-               Playlist playlist = en.createStaticPlaylist(params);
-               return playlist;
-           }
-           catch(EchoNestException e) {
-               System.out.println(e.getMessage());
-           }
-           return new Playlist(new ArrayList<Song>());
-    }
     public static void main(String [] args) {
         SongSearch search = new SongSearch();
         try {
