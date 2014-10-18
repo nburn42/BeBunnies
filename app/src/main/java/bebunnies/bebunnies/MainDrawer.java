@@ -1,32 +1,34 @@
 package bebunnies.bebunnies;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
+import com.spotify.sdk.android.Spotify;
+import com.spotify.sdk.android.playback.ConnectionStateCallback;
+import com.spotify.sdk.android.playback.Player;
+import com.spotify.sdk.android.playback.PlayerNotificationCallback;
+import com.spotify.sdk.android.playback.PlayerState;
 
 public class MainDrawer extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, PlayerNotificationCallback, ConnectionStateCallback {
 
+    private static final String CLIENT_ID = "0023543d6cd041ad8befcff636ad89e5";
+    private static final String REDIRECT_URI = "coke-android://callback";
+    public static Player mPlayer;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
+    private Uri localUri;
+    
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -51,23 +53,26 @@ public class MainDrawer extends Activity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
-    }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
+        Fragment newFragment;
+        switch (position) {
+            case 0:
+                newFragment = PlayWindow.newInstance();
+                break;
             case 1:
-                mTitle = getString(R.string.title_section1);
+                newFragment = PlayWindow.newInstance();
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                newFragment = PlayWindow.newInstance();
                 break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
+            default:
+                newFragment = PlayWindow.newInstance();
                 break;
         }
+
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, PlayWindow.newInstance())
+                .commit();
     }
 
     public void restoreActionBar() {
@@ -103,44 +108,52 @@ public class MainDrawer extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main_drawer, container, false);
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainDrawer) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
+    @Override
+    public void onLoggedIn() {
+        Log.d("logged in", "MYLOG");
     }
 
+    @Override
+    public void onLoggedOut() {
+        Log.d("logged out", "MYLOG");
+    }
+
+    @Override
+    public void onLoginFailed(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onTemporaryError() {
+
+    }
+
+    @Override
+    public void onNewCredentials(String s) {
+
+    }
+
+    @Override
+    public void onConnectionMessage(String s) {
+
+    }
+
+    @Override
+    public void onPlaybackEvent(PlayerNotificationCallback.EventType eventType, PlayerState playerState) {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        Spotify.destroyPlayer(this);
+        super.onDestroy();
+
+    }
+
+    public Player getPlayer() {
+        return mPlayer;
+    }
+
+
 }
+
