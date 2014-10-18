@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 //TODO
 /*
@@ -46,6 +47,8 @@ public class PlayWindow extends Fragment {
      * The fragment argument representing the section number for this
      * fragment.
      */
+    private ImageView imageView ;
+    private boolean paused = false;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public PlayWindow() {
@@ -67,6 +70,21 @@ public class PlayWindow extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.playbutton, container, false);
+        imageView = (ImageView) rootView.findViewById(R.id.imageView);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!paused) {
+                    MainDrawer.mPlayer.pause();
+                    paused = true;
+                } else {
+                    MainDrawer.mPlayer.resume();
+                    paused = false;
+                }
+            }
+        });
+
         return rootView;
     }
 

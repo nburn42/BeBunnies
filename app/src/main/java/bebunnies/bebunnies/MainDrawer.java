@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.spotify.sdk.android.Spotify;
+import com.spotify.sdk.android.authentication.AuthenticationResponse;
+import com.spotify.sdk.android.authentication.SpotifyAuthentication;
 import com.spotify.sdk.android.playback.ConnectionStateCallback;
 import com.spotify.sdk.android.playback.Player;
 import com.spotify.sdk.android.playback.PlayerNotificationCallback;
@@ -23,22 +26,18 @@ public class MainDrawer extends Activity
     private static final String CLIENT_ID = "0023543d6cd041ad8befcff636ad89e5";
     private static final String REDIRECT_URI = "coke-android://callback";
     public static Player mPlayer;
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
+
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Uri localUri;
-    
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
+
     private CharSequence mTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
-
+        SpotifyAuthentication.openAuthWindow(CLIENT_ID, "token", REDIRECT_URI,
+                new String[]{"user-read-private", "streaming"}, null, this);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -47,6 +46,29 @@ public class MainDrawer extends Activity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Uri uri = intent.getData();
+        if (uri != null) {
+            AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
+            Spotify spotify = new Spotify(response.getAccessToken());
+            mPlayer = spotify.getPlayer(this, "My Company Name", this, new Player.InitializationObserver() {
+                @Override
+                public void onInitialized() {
+                    mPlayer.addConnectionStateCallback(MainDrawer.this);
+                    mPlayer.addPlayerNotificationCallback(MainDrawer.this);
+                    mPlayer.play("spotify:track:2TpxZ7JUBn3uw46aR7qd6V");
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+                }
+            });
+        }
     }
 
     @Override
@@ -156,4 +178,3 @@ public class MainDrawer extends Activity
 
 
 }
-
