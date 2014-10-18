@@ -71,17 +71,18 @@ public class SongSearch {
         p.setMaxTempo(tempo + .99f);
         p.setResults(80);
         p.setMinDanceability(.4f);
-        p.setMinArtistHotttnesss(.6f);
         p.setMinSongHotttnesss(.6f);
         p.setMinArtistFamiliarity(.6f);
-        p.setArtistActiveDuring(2007, 2014);
+        p.addIDSpace("spotify");
         p.includeAudioSummary();
+        p.includeTracks();
         List<Song> songs = en.searchSongs(p);
         List<Song> toReturn = new ArrayList<Song>();
         for(Song song : songs) {
            song.fetchBucket("audio_summary");
            double value = song.getDouble("audio_summary.valence");
-           if (value >= .4) {
+           Track track = song.getTrack("spotify");
+           if (value >= .4 && track != null) {
               toReturn.add(song);
            }
         }
@@ -95,6 +96,7 @@ public class SongSearch {
            params.includeAudioSummary();
            params.setSongMinHotttnesss(.5f);
            params.setArtistMinFamiliarity(.3f);
+           params.addArtist("Bruno Mars");
            try {
                Playlist playlist = en.createStaticPlaylist(params);
                return playlist;
@@ -108,13 +110,15 @@ public class SongSearch {
         SongSearch search = new SongSearch();
         try {
             List<Song> songs = search.goodSongSearch(100);
-            System.out.println(songs.size());
             for (Song song : songs) {
-                    song.fetchBucket("audio_summary");
-                    Track track = song.getTrack("spotify-WW");
+                    System.out.println(song);
+                    Track track = song.getTrack("spotify");
                     System.out.println(song.getArtistName());
                     System.out.println(song.getTitle());
+                    System.out.println(song.getTempo());
+                    song.fetchBucket("audio_summary");
                     System.out.println(song.getDouble("audio_summary.valence"));
+                    System.out.println(track.getForeignID());
             }
         }
         catch(EchoNestException e) {
