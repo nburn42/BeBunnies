@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author: Manav Dutta
- * @version: 2.0
+ * @ author: Manav Dutta
+ * @ version: 2.0
  * This is the class that pulls songs from EchoNest
  */
 public class SongSearch {
