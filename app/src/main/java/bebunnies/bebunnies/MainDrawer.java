@@ -1,42 +1,32 @@
 package bebunnies.bebunnies;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import com.spotify.sdk.android.Spotify;
-import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.authentication.SpotifyAuthentication;
 import com.spotify.sdk.android.playback.ConnectionStateCallback;
 import com.spotify.sdk.android.playback.Player;
 import com.spotify.sdk.android.playback.PlayerNotificationCallback;
 import com.spotify.sdk.android.playback.PlayerState;
 
 public class MainDrawer extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, PlayerNotificationCallback, ConnectionStateCallback {
 
     private static final String CLIENT_ID = "0023543d6cd041ad8befcff636ad89e5";
     private static final String REDIRECT_URI = "coke-android://callback";
     public static Player mPlayer;
+    /**
+     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+     */
+    private NavigationDrawerFragment mNavigationDrawerFragment;
     private Uri localUri;
     
     /**
@@ -67,21 +57,21 @@ public class MainDrawer extends Activity
         Fragment newFragment;
         switch (position) {
             case 0:
-                newFragment = MainWindow.newInstance();
+                newFragment = PlayWindow.newInstance();
                 break;
             case 1:
-                newFragment = MainWindow.newInstance();
+                newFragment = PlayWindow.newInstance();
                 break;
             case 2:
-                newFragment = MainWindow.newInstance();
+                newFragment = PlayWindow.newInstance();
                 break;
             default:
-                newFragment = MainWindow.newInstance();
+                newFragment = PlayWindow.newInstance();
                 break;
         }
 
         fragmentManager.beginTransaction()
-                .replace(R.id.container, MainWindow.newInstance())
+                .replace(R.id.container, PlayWindow.newInstance())
                 .commit();
     }
 
@@ -149,7 +139,7 @@ public class MainDrawer extends Activity
     }
 
     @Override
-    public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
+    public void onPlaybackEvent(PlayerNotificationCallback.EventType eventType, PlayerState playerState) {
 
     }
 
@@ -164,51 +154,6 @@ public class MainDrawer extends Activity
         return mPlayer;
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private boolean paused = false;
 
-        private Button pauseButton;
+}
 
-        public PlaceholderFragment() {
-        }
-
-
-    }
-
-/*
- @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainDrawer) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
-        
-        
-        in oncreate
-   pauseButton = (Button) rootView.findViewById(R.id.pauseButton);
-            pauseButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if (!paused) {
-                        mPlayer.pause();
-                        paused = true;
-                    } else {
-                        mPlayer.resume();
-                        paused = false;
-                    }
-                }
-            });
-   
-   
-   and aobove on create
-   private Button pauseButton;
- */
