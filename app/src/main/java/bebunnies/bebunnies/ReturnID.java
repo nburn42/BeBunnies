@@ -22,7 +22,8 @@ public class ReturnID extends AsyncTask<Void, Void, String> {
             return error;
         }
     }
-    public void setSearch(SongSearch songSearch){
+
+    public void setSearch(SongSearch songSearch) {
         searching = songSearch;
     }
 

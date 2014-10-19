@@ -1,7 +1,5 @@
 package bebunnies.bebunnies;
 
-import android.util.Log;
-
 import com.echonest.api.v4.EchoNestAPI;
 import com.echonest.api.v4.EchoNestException;
 import com.echonest.api.v4.Song;
@@ -20,7 +18,7 @@ public class SongSearch {
     private static String APIKey = "TSPV7YH3UINWQAH6T";
     private EchoNestAPI en;
     private List<Song> idsList;
-    private String songName, artistName;
+    public String songName, artistName;
 
 
     /**
@@ -30,25 +28,27 @@ public class SongSearch {
         en = new EchoNestAPI(APIKey);
         idsList = new ArrayList<Song>();
     }
-    public String getSongName(){
+
+    public String getSongName() {
         return songName;
     }
-    public String getArtistName(){
+
+    public String getArtistName() {
         return artistName;
     }
 
     public void goodSongSearch(int tempo, float energy) throws EchoNestException {
         SongParams p = new SongParams();
-        p.setResults(20);
+        p.setResults(40);
 
         p.setMinTempo(tempo);
         p.setMaxTempo(tempo + 5);
 
         p.setMinEnergy(energy);
-        p.setMaxEnergy(energy+.18f);
+        p.setMaxEnergy(energy + .18f);
 
 //        p.setMinDanceability(.4f);
-        p.setMinSongHotttnesss(.3f);
+        p.setMinSongHotttnesss(.6f);
 //        p.setMinArtistFamiliarity(.4f);
 
         p.addIDSpace("spotify");
@@ -76,7 +76,6 @@ public class SongSearch {
         artistName = idsList.get(randomNumber).getArtistName();
         try {
             String id = removed.getTrack("spotify").getForeignID();
-            Log.d(id, "Return Foreign");
             return id;
         } catch (Exception e) {
             String message = e.getMessage();

@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,7 +20,7 @@ import java.util.TimerTask;
  */
 public class PlayWindow extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    SongSearch songSearch;
+    public SongSearch songSearch;
     String returnID;
     /**
      * The fragment argument representing the section number for this
@@ -32,8 +31,9 @@ public class PlayWindow extends Fragment {
     private boolean stopped = false, startTimerBool = true;
     private Timer timer;
     private TimerTask timerTask;
-    private TextView musicTest, currentBpmText, nextBpmText;
+    public TextView musicTest, currentBpmText, nextBpmText;
     private int currentSeekBar, currentBPM, nextBPM;
+    private String songName, artistName;
     private float currentEnergy;
 
     public PlayWindow() {
@@ -65,7 +65,6 @@ public class PlayWindow extends Fragment {
         currentBpmText = (TextView) rootView.findViewById(R.id.textView4);
         nextBpmText = (TextView) rootView.findViewById(R.id.textView5);
 
-
         seekBar.setMax(135);
         currentSeekBar = 123;
         currentBpmText.setText("Current BPM: " + currentSeekBar);
@@ -77,99 +76,99 @@ public class PlayWindow extends Fragment {
 
         currentEnergy = .5f;
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                currentSeekBar = i + 55;
-                if (startTimerBool) {
-                    currentBpmText.setText("Current BPM: " + currentSeekBar);
-                }
-                nextBpmText.setText("Next BPM: " + currentSeekBar);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        energyBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                currentEnergy = i * .2f;
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        imageView.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View view) {
-//                                             Toast.makeText(view.getParent().get,"Loading Song...",Toast.LENGTH_LONG).show();
-                                             if (!stopped) {
-                                                 imageView.setImageResource(R.drawable.stopbutton);
-                                                 if (startTimerBool) {
-                                                     try {
-                                                         songSearch = new SongSearch();
-                                                         songSearch = new SearchTask(songSearch, currentSeekBar, currentEnergy).execute().get();
-                                                         returnID = new ReturnID(songSearch).execute().get();
-                                                         returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
-                                                     } catch (Exception e) {
-                                                         Log.d(e.getMessage(), "Debug");
-                                                     }
-                                                     musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
-                                                     MainDrawer.mPlayer.play(returnID);
-
-                                                     startTimerBool = false;
-                                                 } else {
-                                                     Toast.makeText(getActivity(),"Loading...",Toast.LENGTH_SHORT).show();
-                                                     try {
-                                                         songSearch = new SongSearch();
-                                                         songSearch = new SearchTask(songSearch, currentSeekBar, currentEnergy).execute().get();
-                                                         currentBpmText.setText("Current BPM: " + currentSeekBar);
-                                                         returnID = new ReturnID(songSearch).execute().get();
-                                                         returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
-                                                         Log.d(returnID, "Return ID");
-                                                         musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
-                                                         MainDrawer.mPlayer.play(returnID);
-                                                     } catch (Exception e) {
-                                                         Log.d("Debug", e.getMessage());
-                                                     }
-                                                 }
-                                                 startTimer();
-                                                 stopped = true;
-                                             } else if (stopped & !startTimerBool) {
-                                                 imageView.setImageResource(R.drawable.playbutton);
-                                                 stopTimer();
-                                                 MainDrawer.mPlayer.pause();
-                                                 stopped = false;
-                                             }
-                                         }
-
-                                     }
-
-        );
+        imageView.setOnClickListener(onClickListener);
 
         return rootView;
+    }
+
+    protected View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (!stopped) {
+                imageView.setImageResource(R.drawable.stopbutton);
+                if (startTimerBool) {
+                    try {
+                        songSearch = new SongSearch();
+                        songSearch = new SearchTask(songSearch, currentSeekBar, currentEnergy).execute().get();
+                        returnID = new ReturnID(songSearch).execute().get();
+                        returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
+                        musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
+                        MainDrawer.mPlayer.play(returnID);
+                    } catch (Exception e) {
+                        Log.d(e.getMessage(), "Debug");
+                    }
+                    startTimerBool = false;
+                } else {
+                    try {
+                        songSearch = new SongSearch();
+                        songSearch = new SearchTask(songSearch, currentSeekBar, currentEnergy).execute().get();
+                        returnID = new ReturnID(songSearch).execute().get();
+                        returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
+                        currentBpmText.setText("Current BPM: " + currentSeekBar);
+                        MainDrawer.mPlayer.play(returnID);
+                        musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
+                    } catch (Exception e) {
+                        Log.d(e.getMessage(), "Debug");
+                    }
+
+                }
+                stopped = true;
+                startTimer();
+            } else if (stopped & !startTimerBool) {
+                imageView.setImageResource(R.drawable.playbutton);
+                stopTimer();
+                MainDrawer.mPlayer.pause();
+                stopped = false;
+            }
+        }
+    };
+    protected SeekBar.OnSeekBarChangeListener onSeekBarListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            currentSeekBar = i + 55;
+            if (startTimerBool) {
+                currentBpmText.setText("Current BPM: " + currentSeekBar);
+            }
+            nextBpmText.setText("Next BPM: " + currentSeekBar);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+    protected SeekBar.OnSeekBarChangeListener onEnergyBarListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            currentEnergy = i * .2f;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        seekBar.setOnSeekBarChangeListener(onSeekBarListener);
+        energyBar.setOnSeekBarChangeListener(onEnergyBarListener);
     }
 
     public void startTimer() {
         timer = new Timer();
         initializeTimerTask();
-        timer.schedule(timerTask, 40000);
+        timer.schedule(timerTask, 10000, 10000);
     }
 
     public void stopTimer() {
@@ -187,18 +186,18 @@ public class PlayWindow extends Fragment {
                 try {
                     songSearch = new SongSearch();
                     songSearch = new SearchTask(songSearch, currentSeekBar, currentEnergy).execute().get();
-                    currentBpmText.setText("Current BPM: " + currentSeekBar);
                     returnID = new ReturnID(songSearch).execute().get();
+                    musicTest.setText(songSearch.songName + ", " + songSearch.artistName);
                     returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
-                    Log.d(returnID, "RunReturnID");
-                    musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
+                    currentBpmText.setText("Current BPM: " + currentSeekBar);
                     MainDrawer.mPlayer.play(returnID);
                 } catch (Exception e) {
-                    Log.d("Debug", e.getMessage());
+                    Log.d(e.getMessage(), "error");
                 }
             }
         };
     }
+
 
     @Override
     public void onAttach(Activity activity) {

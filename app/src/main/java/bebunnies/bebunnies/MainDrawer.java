@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.spotify.sdk.android.Spotify;
@@ -53,7 +52,6 @@ public class MainDrawer extends Activity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Toast.makeText(this, "Loading...", Toast.LENGTH_LONG).show();
         Uri uri = intent.getData();
         if (uri != null) {
             AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
@@ -63,6 +61,7 @@ public class MainDrawer extends Activity
                 public void onInitialized() {
                     mPlayer.addConnectionStateCallback(MainDrawer.this);
                     mPlayer.addPlayerNotificationCallback(MainDrawer.this);
+                    makeToast();
                 }
 
                 @Override
@@ -72,6 +71,10 @@ public class MainDrawer extends Activity
             });
         }
     }
+    public void makeToast(){
+        Toast.makeText(this, "Loading...", Toast.LENGTH_LONG).show();
+    }
+
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -120,17 +123,18 @@ public class MainDrawer extends Activity
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//        int id = item.getItemId();
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//        return false;
+//    }
 
     @Override
     public void onLoggedIn() {
