@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.spotify.sdk.android.Spotify;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -35,6 +36,7 @@ public class MainDrawer extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toast.makeText(this,"Please Login to Spotify",Toast.LENGTH_LONG).show();
         setContentView(R.layout.activity_main_drawer);
         SpotifyAuthentication.openAuthWindow(CLIENT_ID, "token", REDIRECT_URI,
                 new String[]{"user-read-private", "streaming"}, null, this);
@@ -51,6 +53,7 @@ public class MainDrawer extends Activity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        Toast.makeText(this, "Loading...", Toast.LENGTH_LONG).show();
         Uri uri = intent.getData();
         if (uri != null) {
             AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);

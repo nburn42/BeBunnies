@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -64,6 +65,7 @@ public class PlayWindow extends Fragment {
         currentBpmText = (TextView) rootView.findViewById(R.id.textView4);
         nextBpmText = (TextView) rootView.findViewById(R.id.textView5);
 
+
         seekBar.setMax(135);
         currentSeekBar = 123;
         currentBpmText.setText("Current BPM: " + currentSeekBar);
@@ -116,6 +118,7 @@ public class PlayWindow extends Fragment {
         imageView.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View view) {
+//                                             Toast.makeText(view.getParent().get,"Loading Song...",Toast.LENGTH_LONG).show();
                                              if (!stopped) {
                                                  imageView.setImageResource(R.drawable.stopbutton);
                                                  if (startTimerBool) {
@@ -132,6 +135,7 @@ public class PlayWindow extends Fragment {
 
                                                      startTimerBool = false;
                                                  } else {
+                                                     Toast.makeText(getActivity(),"Loading...",Toast.LENGTH_SHORT).show();
                                                      try {
                                                          songSearch = new SongSearch();
                                                          songSearch = new SearchTask(songSearch, currentSeekBar, currentEnergy).execute().get();
@@ -165,7 +169,7 @@ public class PlayWindow extends Fragment {
     public void startTimer() {
         timer = new Timer();
         initializeTimerTask();
-        timer.schedule(timerTask, 40000, 40000);
+        timer.schedule(timerTask, 40000);
     }
 
     public void stopTimer() {
