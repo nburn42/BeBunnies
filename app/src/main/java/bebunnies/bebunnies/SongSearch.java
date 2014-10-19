@@ -20,6 +20,7 @@ public class SongSearch {
     private static String APIKey = "TSPV7YH3UINWQAH6T";
     private EchoNestAPI en;
     private List<Song> idsList;
+    private String songName, artistName;
 
     /**
      * This constructs a new song search instance
@@ -28,6 +29,13 @@ public class SongSearch {
         en = new EchoNestAPI(APIKey);
         idsList = new ArrayList<Song>();
     }
+    public String getSongName(){
+        return songName;
+    }
+    public String getArtistName(){
+        return artistName;
+    }
+
 
     public void goodSongSearch(int tempo) throws EchoNestException {
         SongParams p = new SongParams();
@@ -57,14 +65,9 @@ public class SongSearch {
 
     public String returnForeignID() {
         int randomNumber = (int) (Math.floor(Math.random() * idsList.size()));
-        for (int i = 0; i < idsList.size(); i++) {
-            try {
-                Log.d(" ","Return all IDs");
-                Log.d(idsList.get(i).getTrack("spotify").getForeignID().toString(), "Return all IDs");
-            } catch (Exception e) {
-            }
-        }
         Song removed = idsList.get(randomNumber);
+        songName = idsList.get(randomNumber).getTitle();
+        artistName = idsList.get(randomNumber).getArtistName();
         try {
             String id = removed.getTrack("spotify").getForeignID();
             Log.d(id, "Return Foreign");

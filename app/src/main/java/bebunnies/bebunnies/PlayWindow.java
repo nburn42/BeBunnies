@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,7 +31,8 @@ public class PlayWindow extends Fragment {
     private boolean stopped = false, startTimerBool = true;
     private Timer timer;
     private TimerTask timerTask;
-    private int currentSeekBar,currentBPM, nextBPM;
+    private TextView musicTest;
+    private int currentSeekBar, currentBPM, nextBPM;
 
     public PlayWindow() {
     }
@@ -54,11 +56,12 @@ public class PlayWindow extends Fragment {
 
         imageView = (ImageView) rootView.findViewById(R.id.imageView);
         seekBar = (SeekBar) rootView.findViewById(R.id.seekBar2);
+        musicTest = (TextView) rootView.findViewById(R.id.textView3);
         seekBar.setMax(170);
 
         try {
             songSearch = new SongSearch();
-            songSearch = new SearchTask(songSearch, 100).execute().get();
+            songSearch = new SearchTask(songSearch, (int)(Math.random()*120+60)).execute().get();
             returnID = new ReturnID(songSearch).execute().get();
             returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
         } catch (Exception e) {
@@ -67,7 +70,7 @@ public class PlayWindow extends Fragment {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                currentSeekBar = i+50;
+                currentSeekBar = i + 50;
             }
 
             @Override
@@ -86,8 +89,9 @@ public class PlayWindow extends Fragment {
                                              if (!stopped) {
                                                  imageView.setImageResource(R.drawable.stopbutton);
                                                  if (startTimerBool) {
+                                                     musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
                                                      MainDrawer.mPlayer.play(returnID);
-                                                     startTimer();
+
                                                      startTimerBool = false;
                                                  } else {
                                                      try {
@@ -96,14 +100,17 @@ public class PlayWindow extends Fragment {
                                                          returnID = new ReturnID(songSearch).execute().get();
                                                          returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
                                                          Log.d(returnID, "Return ID");
+                                                         musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
                                                          MainDrawer.mPlayer.play(returnID);
                                                      } catch (Exception e) {
                                                          Log.d("Debug", e.getMessage());
                                                      }
                                                  }
+                                                 startTimer();
                                                  stopped = true;
                                              } else if (stopped) {
                                                  imageView.setImageResource(R.drawable.playbutton);
+                                                 stopTimer();
                                                  MainDrawer.mPlayer.pause();
                                                  stopped = false;
                                              }
@@ -119,7 +126,7 @@ public class PlayWindow extends Fragment {
     public void startTimer() {
         timer = new Timer();
         initializeTimerTask();
-        timer.schedule(timerTask, 20000, 20000);
+        timer.schedule(timerTask, 40000, 40000);
     }
 
     public void stopTimer() {
@@ -140,6 +147,7 @@ public class PlayWindow extends Fragment {
                     returnID = new ReturnID(songSearch).execute().get();
                     returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
                     Log.d(returnID, "RunReturnID");
+                    musicTest.setText(songSearch.getSongName() + ", " + songSearch.getArtistName());
                     MainDrawer.mPlayer.play(returnID);
                 } catch (Exception e) {
                     Log.d("Debug", e.getMessage());
