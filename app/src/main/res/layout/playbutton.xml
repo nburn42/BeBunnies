@@ -3,7 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    android:keepScreenOn="true">
 
     <LinearLayout
         android:orientation="vertical"
@@ -17,8 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/seekBar2"
-            android:progress="50"
-            android:paddingTop="20dp" />
+            android:progress="67"
+            android:paddingTop="20dp"
+            android:max="135" />
     </LinearLayout>
 
     <LinearLayout
@@ -52,8 +54,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/seekBar"
-            android:progress="50"
-            android:paddingTop="20dp" />
+            android:progress="2"
+            android:paddingTop="20dp"
+            android:max="4" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -105,8 +108,8 @@
             android:id="@+id/textView4"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="30dp"
+            android:textColor="#ff757676"
+            android:textSize="25dp"
             android:gravity="center" />
 
         <TextView
@@ -117,7 +120,7 @@
             android:id="@+id/textView5"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:textColor="#ffffff"
+            android:textColor="#ff828282"
             android:textSize="20dp"
             android:gravity="center" />
     </LinearLayout>

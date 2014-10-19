@@ -22,6 +22,7 @@ public class SongSearch {
     private List<Song> idsList;
     private String songName, artistName;
 
+
     /**
      * This constructs a new song search instance
      */
@@ -36,15 +37,20 @@ public class SongSearch {
         return artistName;
     }
 
-
-    public void goodSongSearch(int tempo) throws EchoNestException {
+    public void goodSongSearch(int tempo, float energy) throws EchoNestException {
         SongParams p = new SongParams();
-        p.setMinTempo(tempo);
-        p.setMaxTempo(tempo + .99f);
         p.setResults(20);
-        p.setMinDanceability(.4f);
-        p.setMinSongHotttnesss(.6f);
-        p.setMinArtistFamiliarity(.6f);
+
+        p.setMinTempo(tempo);
+        p.setMaxTempo(tempo + 5);
+
+        p.setMinEnergy(energy);
+        p.setMaxEnergy(energy+.18f);
+
+//        p.setMinDanceability(.4f);
+        p.setMinSongHotttnesss(.3f);
+//        p.setMinArtistFamiliarity(.4f);
+
         p.addIDSpace("spotify");
         p.includeAudioSummary();
         p.includeTracks();
