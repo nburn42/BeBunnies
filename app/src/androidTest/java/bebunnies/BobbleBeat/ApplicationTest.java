@@ -1,4 +1,4 @@
-package bebunnies.bebunnies;
+package bebunnies.BobbleBeat;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
