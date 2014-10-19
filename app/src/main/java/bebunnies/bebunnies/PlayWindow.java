@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -15,14 +19,18 @@ import android.widget.ImageView;
  */
 public class PlayWindow extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    SongSearch songSearch ;
+    SongSearch songSearch;
     String returnID;
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
     private ImageView imageView;
-    private boolean stopped = false, ranOnce = false;
+    private SeekBar seekBar;
+    private boolean stopped = false, startTimerBool = true;
+    private Timer timer;
+    private TimerTask timerTask;
+    private int currentSeekBar,currentBPM, nextBPM;
 
     public PlayWindow() {
     }
@@ -41,46 +49,66 @@ public class PlayWindow extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
+                             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.playbutton, container, false);
+
         imageView = (ImageView) rootView.findViewById(R.id.imageView);
+        seekBar = (SeekBar) rootView.findViewById(R.id.seekBar2);
+        seekBar.setMax(170);
+
+        try {
+            songSearch = new SongSearch();
+            songSearch = new SearchTask(songSearch, 100).execute().get();
+            returnID = new ReturnID(songSearch).execute().get();
+            returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
+        } catch (Exception e) {
+            Log.d(e.getMessage(), "Debug");
+        }
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                currentSeekBar = i+50;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         imageView.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View view) {
-                                             //if (!ranOnce) {
-                                                 try {
-                                                     songSearch = new SongSearch();
-                                                     songSearch = new SearchTask(songSearch).execute().get();
-                                                     returnID = new ReturnID(songSearch).execute().get();
-                                                     Log.d(returnID, "returnID");
-                                                     returnID.replaceAll("spotify-CA","spotify");
+                                             if (!stopped) {
+                                                 imageView.setImageResource(R.drawable.stopbutton);
+                                                 if (startTimerBool) {
                                                      MainDrawer.mPlayer.play(returnID);
-                                                     ranOnce = true;
-                                                 } catch (Exception e) {
-                                                     Log.d(e.toString(),"FDF");
-                                                 }
-                                             /*} else {
-                                                 if (!stopped) {
+                                                     startTimer();
+                                                     startTimerBool = false;
+                                                 } else {
                                                      try {
-//                                                         songSearch.removeFirst();
-//                                                         ReturnID.setSearch(songSearch);
-                                                         int index = returnID.indexOf("-");
-                                                         int index1 = returnID.indexOf(":");
-                                                         returnID = returnID.substring(0, index) + returnID.substring(index1, returnID.length());
+                                                         songSearch = new SongSearch();
+                                                         songSearch = new SearchTask(songSearch, currentSeekBar).execute().get();
+                                                         returnID = new ReturnID(songSearch).execute().get();
+                                                         returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
+                                                         Log.d(returnID, "Return ID");
                                                          MainDrawer.mPlayer.play(returnID);
                                                      } catch (Exception e) {
                                                          Log.d("Debug", e.getMessage());
                                                      }
-                                                     imageView.setImageResource(R.drawable.stopbutton);
-                                                     stopped = true;
-                                                 } else if (stopped) {
-                                                     imageView.setImageResource(R.drawable.playbutton);
-                                                     MainDrawer.mPlayer.pause();
-                                                     stopped = false;
                                                  }
-                                             }*/
+                                                 stopped = true;
+                                             } else if (stopped) {
+                                                 imageView.setImageResource(R.drawable.playbutton);
+                                                 MainDrawer.mPlayer.pause();
+                                                 stopped = false;
+                                             }
                                          }
+
                                      }
 
         );
@@ -88,8 +116,41 @@ public class PlayWindow extends Fragment {
         return rootView;
     }
 
+    public void startTimer() {
+        timer = new Timer();
+        initializeTimerTask();
+        timer.schedule(timerTask, 20000, 20000);
+    }
+
+    public void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+
+    }
+
+    public void initializeTimerTask() {
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    songSearch = new SongSearch();
+                    songSearch = new SearchTask(songSearch, currentSeekBar).execute().get();
+                    returnID = new ReturnID(songSearch).execute().get();
+                    returnID = "spotify" + returnID.substring(returnID.indexOf(":"), returnID.length());
+                    Log.d(returnID, "RunReturnID");
+                    MainDrawer.mPlayer.play(returnID);
+                } catch (Exception e) {
+                    Log.d("Debug", e.getMessage());
+                }
+            }
+        };
+    }
+
     @Override
     public void onAttach(Activity activity) {
+
         super.onAttach(activity);
 
     }

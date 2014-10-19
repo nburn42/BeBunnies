@@ -1,5 +1,7 @@
 package bebunnies.bebunnies;
 
+import android.util.Log;
+
 import com.echonest.api.v4.EchoNestAPI;
 import com.echonest.api.v4.EchoNestException;
 import com.echonest.api.v4.Song;
@@ -54,17 +56,24 @@ public class SongSearch {
 
 
     public String returnForeignID() {
-        int randomNumber = (int)(Math.floor(Math.random()*idsList.size()));
+        int randomNumber = (int) (Math.floor(Math.random() * idsList.size()));
+        for (int i = 0; i < idsList.size(); i++) {
+            try {
+                Log.d(" ","Return all IDs");
+                Log.d(idsList.get(i).getTrack("spotify").getForeignID().toString(), "Return all IDs");
+            } catch (Exception e) {
+            }
+        }
         Song removed = idsList.get(randomNumber);
         try {
             String id = removed.getTrack("spotify").getForeignID();
+            Log.d(id, "Return Foreign");
             return id;
-        }
-            catch(Exception e){
-                String message = e.getMessage();
-                return e.getMessage();
-            }
-
+        } catch (Exception e) {
+            String message = e.getMessage();
+            return e.getMessage();
         }
 
     }
+
+}
