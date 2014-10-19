@@ -60,7 +60,8 @@ public class MainDrawer extends Activity
                 public void onInitialized() {
                     mPlayer.addConnectionStateCallback(MainDrawer.this);
                     mPlayer.addPlayerNotificationCallback(MainDrawer.this);
-                    mPlayer.play("spotify:track:2TpxZ7JUBn3uw46aR7qd6V");
+//                    mPlayer.play("spotify:track:2TpxZ7JUBn3uw46aR7qd6V");
+//                    mPlayer.pause();
                 }
 
                 @Override
