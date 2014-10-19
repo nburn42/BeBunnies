@@ -90,7 +90,7 @@
             android:orientation="horizontal"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:background="#e2f26b"
+            android:background="#23000000"
             android:id="@+id/linearLayout4"
             android:layout_weight="1"
             android:layout_marginTop="2.5dp"
